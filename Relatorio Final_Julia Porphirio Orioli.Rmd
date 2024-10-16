@@ -1,0 +1,410 @@
+---
+title: 'Projeto Final: Júlia Porphirio Orioli'
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+date: "2024-02-23"
+---
+<br>
+<br>
+<br>
+<center>
+# <font color="steelblue">Opinião dos Cidadãos sobre o Interesse por Política na Índia</font>
+<center>
+
+
+<br>
+<div style="text-align: justify;">Neste relatório pretendo analisar o interesse por política e o quanto os cidadãos da Índia discutem política, com ênfase nas diferenças de género. Como as mulheres e homens indianos se comportam em relação a essas duas questões. 
+ 
+A civilização indiana surgiu na Antiguidade, tendo escrita, religião, política e filosofia avançadas, mas a Índia como país moderno reconhecido e independente estabeleceu-se em 1947, com uma constituição republicana, democrática e laica, promulgada em 1950. O país tem mais de 1 bilhão de habitantes, é a maior democracia do mundo, com grandes problemas sociais, 39% da população adulta é analfabeta, com 15% da população na pobreza e ainda, mesmo proibida, engessados pelo sistema de castas. 
+  
+Nas primeiras eleições o partido de Mahatma Gandhi venceu, sua filha Indira Gandhi e seu neto Rajiv Gandhi o sucederam ao longo das décadas de 1970 e 1980, mantendo o Partido do Congresso no poder por mais de 30 anos. Nas décadas de 1990 e 2000 o país teve uma turbulência política, no entanto, a dinastia Gandhi continuou sendo escolhida para o cargo de primeiro-ministro. 
+
+Mesmo as mulheres tendo ocupado um dos maiores cargos políticos por muitos anos, elas ainda são subjugadas na sociedade indiana, sendo minoria na força de trabalho, ainda ficam restritas aos trabalhos domésticos, enfrentam o medo da violência de género e pouca participação na política, são 13% em cargos eleitos. Por causa dessa discrepância é importante entender a diferenças entre os género masculino e feminino no interesse e discurso sobre política.</div> 
+<br>
+<center>
+<h4>**DEFINIÇÃO DA AMOSTRA DOS CIDADÃOS INQUIRIDOS**</h4>
+<center>
+
+<br>
+<div style="text-align: justify;">O questionário foi aplicado a 1209 pessoas, dessas 539 são do género feminino e 670 são do género masculino. Como demonstrado na tabela abaixo. </div> 
+<br>
+<center>
+
+
+<center>
+<h4>**Tabela 1- Quantidade de Inquiridos por género**</h4>
+<center>
+
+
+
+  
+```{r setup, include=FALSE}
+
+setwd("C:/Users/juliaorioli/Desktop/UpSkill/Modulo 7 parte 2")
+getwd()
+
+
+library("readxl")
+library("openxlsx")
+RF1 <- read.xlsx("Citizenship_2014_IN_India.xlsx")
+
+
+library("haven")
+library("tidyverse")
+library("descr")
+library("flextable")
+library("moments")
+library("DescTools")
+library("rstatix")
+library("tidyverse")
+library("dplyr")
+```
+
+
+```{r warning=FALSE, include=FALSE}
+colnames(RF1)
+
+summary(RF1)
+
+
+tab_sexo <- table(RF1$Sexo)
+tab_sexo
+
+
+```
+
+
+
+```{r echo=FALSE, warning=FALSE}
+dados <- data.frame(
+  Sexo = c("Feminino", "Masculino"),
+  Quantidade = c(539, 670)
+)
+
+totalHM <- flextable(dados)
+totalHM <- bg(totalHM, bg = "#138808", part = "header")
+totalHM <- color(totalHM, color = "white", part = "header")
+totalHM <- autofit(totalHM)
+totalHM
+```
+
+<br>
+<div style="text-align: justify;"> Na tabela, é demonstrado uma diferença de 131 homens a mais que mulheres. </div> 
+<br>
+<center>
+
+```{r warning=FALSE, include=FALSE}
+tab_sexop <- round(prop.table(table(RF1$Sexo))*100,digits=1)
+tab_sexop
+tab_habsx <- table(RF1$Habilitações,RF1$Sexo)
+tab_habsx
+
+protab_habsx <- round((prop.table(tab_habsx)*100),1)
+protab_habsx
+```
+<center>
+<h4>**Gráfico 1- Percentagem de homens e mulheres inquiridos**</h4>
+<center>
+
+```{r echo=FALSE, warning=FALSE}
+pie_sexo <- pie(tab_sexop,
+    main="",
+    labels = c("Feminino (44.6%)","Masculino (55.4%)"),
+    col=c("#FF9933","#138808"))
+```
+br>
+<div style="text-align: justify;"> Essa diferença de total de inquiridos por género também é visualizada quando analisamos as percentagens de homens e mulheres que responderam ao questionário, e deve ser levada em consideração ao longo deste relatório, já que é uma diferença de mais de 10% de homens que foram inquiridos.  </div> 
+<br>
+<center>
+
+
+
+```{r warning=FALSE, include=FALSE}
+media_idade <- aggregate(Idade ~ Sexo, data = RF1, FUN = mean)
+media_idade
+
+idade_media <- data.frame(Sexo = c("Feminino", "Masculino"),
+                          Idade = c(41, 38))
+idade_media
+```
+
+```{r warning=FALSE, include=FALSE}
+fidade <- flextable(idade_media)
+
+fidade <- bg(fidade, bg = "#138808", part = "header")
+
+fidade <- color(fidade, color = "white", part = "header")
+fidade <- autofit(fidade)
+
+```
+<center>
+<h4>**Tabela 2- Média da idade dos inquiridos por género**</h4>
+<center>
+
+```{r echo=FALSE}
+fidade
+
+```
+
+<br>
+<div style="text-align: justify;"> Notas-e que a média de idade dos inquiridos variam de 41 anos para as mulheres e 38 anos para os homens, ou seja, a maioria são adultos em uma faixa etária acima dos trinta.  </div> 
+<br>
+<center>
+
+<center>
+<h4>**Gráfico 2- Boxplot sobre a Idade e Género**</h4>
+<center>
+```{r echo=FALSE, warning=FALSE}
+boxplot <- ggplot(RF1, aes(x = Sexo, y = Idade, fill = Sexo)) +
+  geom_boxplot() +
+  labs(title = "",
+       x = "",
+       y = "",
+       fill = "Sexo") +
+  scale_fill_manual(values = c("#FF9933", "#138808")) +  
+  theme_minimal()
+boxplot+stat_summary(fun=mean, geom="point", size=2, color="red")
+
+
+```
+<br>
+<div style="text-align: justify;"> No bloxpot, vemos que a maioria dos inquiridos encontram-se entre 30 e 40 anos, sendo as mulheres mais velhas. Alguns outliners com mais de 60 anos e a idade inicial para resposta do questionário foi de 18 anos.   </div> 
+<br>
+<center>
+
+```{r warning=FALSE, include=FALSE}
+tab_habsx <- table(RF1$Habilitações,RF1$Sexo)
+tab_habsx
+
+protab_habsx <- round((prop.table(tab_habsx)*100),1)
+protab_habsx
+
+flex_prosx<- data.frame(
+  Habilitações = c("Ensino médio (não dá acesso à universidade)", 
+                "Ensino secundário (dá acesso à universidade)", 
+                "Ensino superior (1º ciclo)", 
+                "Ensino Superior (mestrado e doutoramento)", 
+                "Ensino técnico/profissional", 
+                "Primário (elementary education)", 
+                "Sem educação formal"),
+  Feminino = c(12.3, 6.8, 4.1, 1.2, 0.1, 6.5, 13.6),
+  Masculino = c(16.5, 9.2, 7.0, 0.6, 0.5, 7.3, 14.3))
+```
+
+<center>
+<h4>**Tabela 3- Média da porcentagem das habilitações dos inquiridos **</h4>
+<center>
+
+
+
+```{r echo=FALSE, warning=FALSE}
+flextab_sx <- flextable(flex_prosx)
+flextab_sx <- bg(flextab_sx, bg = "#138808", part = "header")
+flextab_sx <- color(flextab_sx, color = "white", part = "header")
+flextab_sx <- autofit(flextab_sx)
+flextab_sx
+```
+```{r warning=FALSE, include=FALSE}
+RF1 <- RF1%>%
+  mutate(Q12= factor(Q12,levels=c("Nenhum interesse", "Pouco interesse","Algum interesse","Muito interesse")))
+RF1_sem_na <- na.omit(RF1$Q12)
+
+```
+
+<br>
+<div style="text-align: justify;"> Na tabela 3, notamos que a maioria tem Ensino Médio que não dá acesso à universidade ou não tem educação formal. Com uma maioria masculina no Ensino Superior e Ensino Secundário que dá acesso à universidade. Isso já demonstra um contexto social indiano em que homens tem maior acesso a universidade em comparação às mulheres.   </div> 
+<br>
+<center>
+
+<center>
+<h4>**ANÁLISE DO INTERESSE POR POLÍTICA E O HÁBITO DE SE DISCURTIR POLÍTICA COMPARADOS POR GÉNERO **</h4>
+<center>
+
+<br>
+<div style="text-align: justify;"> Nesta segunda parte, iremos analisar o interesse e hábito de se discurtir política no cotidiano, interessar-se pelo assunto é um ponto essencial para a participação na política e na democracia, só existe efetiva participação se há debate sobre política.  </div> 
+<br>
+<center>
+
+<center>
+<h4>**Gráfico 3- Análise do total de inquiridos e o interesse por política **</h4>
+<center>
+
+```{r echo=FALSE, warning=FALSE}
+Barra_ <- ggplot(data.frame(Q12 = RF1_sem_na), aes(Q12)) +
+  geom_bar(fill = "#FF9933", color = "white") +  
+  geom_text(stat = 'count', aes(label = ..count.., vjust = 2), color = "white") +
+  labs(x = "", y = "") +
+  theme_minimal()
+Barra_
+```
+br>
+<div style="text-align: justify;"> No gráfico 3,  notamos que a maioria dos 1209 inquiridos, totalizando 641, possuem *Nenhum interesse* ou *Pouco interesse* em política, outros 437 tem *Algum interesse* ou *Muito interesse*.  </div> 
+<br>
+<center>
+
+<center>
+<h4>**Gráfico 4- Interesse por Política Comparado por Género **</h4>
+<center>
+
+```{r warning=FALSE, include=FALSE}
+tabela_SQ <- table(RF1$Sexo, RF1$Q12)
+tabela_SQ
+media_por_interesse <- mean(tabela_SQ)
+media_por_interesse
+RF1_sem_na <- na.omit(RF1[c("Q12", "Sexo")])
+```
+
+```{r echo=FALSE, warning=FALSE}
+Barra3_ <- ggplot(RF1_sem_na, aes(x = Q12, fill = Sexo)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat = 'count', aes(label = ..count.., group = Sexo), position = position_dodge(width = 0.9), vjust = 2, color = "white") +
+  geom_hline(yintercept = media_por_interesse, color = "#138808" , linetype = "dashed") +
+  geom_text(aes(label = paste("", round(media_por_interesse))), 
+            x = length(unique(RF1_sem_na$Q12))/1.09, 
+            y = media_por_interesse, vjust = -0.5, color = "#138808", size = 4, hjust = -0.5) +
+  labs(title = "",
+       x = "",
+       y = "") +
+  scale_fill_manual(values = c("#FF9933","#138808")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 8), axis.text.y = element_text(size = 8), plot.title = element_text(hjust = 0.5)) +
+  ggtitle("")
+Barra3_
+
+```
+<br>
+<div style="text-align: justify;"> Relativamente a comparação do interesse por política e o género, podemos afirmar que os homens tem mais interesse no assunto, tendo em vista que as mulheres só responderam mais a categoria *Nenhum interesse*, nas outras os homene tem uma quantidade de respostas muito mais superior. Isto demonstra a falta de interesse politíco feminino na Índia. A média de resposta a essa pergunta foi de 135 respostas e o género feminino só superou a média em *Nenhum interesse*, enquanto o masculino é superior em *Pouco interesse* e *Algum interesse*.   </div> 
+<br>
+<center>
+```{r warning=FALSE, include=FALSE}
+
+tab_intp <- round(prop.table(tabela_SQ)*100,digits=1)
+tab_intp
+
+BD_int <- data.frame(
+  Interesse = c("Nenhum interesse", "Pouco interesse", "Algum interesse", "Muito interesse"),
+  Feminino = c(16.5, 11.3, 11.0, 5.9),
+  Masculino = c(14.4, 17.3, 15.4, 8.2))
+
+BD_int <- BD_int[, !is.na(BD_int[1,])]
+
+
+BD_int <- pivot_longer(BD_int, cols = c(Feminino, Masculino), names_to = "Sexo", values_to = "Porcentagem")
+
+BD_int <- BD_int%>%
+  mutate(Interesse= factor(Interesse,levels=c("Nenhum interesse", "Pouco interesse","Algum interesse","Muito interesse")))
+
+med_int <- mean(BD_int$Porcentagem)
+med_int
+
+```
+
+<center>
+<h4>**Gráfico 5- Percentagem do Interesse por Política Comparado por Género **</h4>
+<center>
+
+```{r echo=FALSE, warning=FALSE}
+grafpint <- ggplot(BD_int, aes(x = Interesse, y = Porcentagem, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "stack") +
+  geom_text(aes(label = paste0(round(Porcentagem, 1), "%")), 
+            position = position_stack(vjust = 0.5), 
+            color = "white", size = 3) + 
+  geom_hline(yintercept = med_int, color = "green", linetype = "dashed")+
+  geom_text(aes(label = paste("", round(med_int
+  ))), 
+            x = length(unique(BD_int$Porcentagem))/1.09, 
+            y = med_int, vjust = 1, color = "#138808", size = 4, hjust = 1.5)+
+  labs(title = "",
+       x = "",
+       y = "",
+       fill = "Sexo") +scale_fill_manual(values = c("#FF9933", "#138808"))+
+  theme_minimal()
+ 
+grafpint <- grafpint +
+  theme(legend.position = "top")
+
+grafpint
+```
+
+<br>
+<div style="text-align: justify;"> A tendência fica mais evidente ao analisarmos a percentagem de respostas, somente em *Nenhum interesse* o género feminino é superior à média de 13%.   </div> 
+<br>
+<center>
+
+```{r warning=FALSE, include=FALSE}
+tab_pdir <- table(RF1$Q17, RF1$Sexo)
+tab_pdir
+
+tab_pdire <- round(prop.table(tab_pdir)*100,digits=1)
+tab_pdire
+
+bd_discpol <- data.frame(categoria = c("As vezes", "Frequentemente", "Nunca", "Raramente"),
+  Feminino= c(17.7, 5.2, 10.9, 10.4),
+  Masculino= c(24.6, 8.4, 9.1, 13.8))
+
+bd_discpol2 <- pivot_longer(bd_discpol, cols = -categoria, names_to = "Sexo", values_to = "Porcentagem")
+
+media_disc <- mean(bd_discpol2$Porcentagem)
+media_disc1 <- round((media_disc), digits=0)
+media_disc1
+bd_discpol2 <- bd_discpol2%>%
+  mutate(categoria= factor(categoria,levels=c("Nunca", "Raramente","As vezes","Frequentemente")))
+```
+<center>
+<h4>**Gráfico 6- Percentagem do quanto discutem política no dia a dia por género **</h4>
+<center>
+
+```{r echo=FALSE, warning=FALSE}
+Barra4_ <- grafico_barras <- ggplot(bd_discpol2, aes(x = categoria, y = Porcentagem, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_hline(yintercept = media_disc1, color = "#138808", linetype = "dashed")+
+  geom_text(aes(label = paste0(round(Porcentagem), "%")), position = position_dodge(width = 0.7), vjust = 1.5, color= "white" )+
+  annotate("text", x = 1.5, y = media_disc1, label = paste("", round(media_disc1), "%"), vjust = -0.9, color = "#138808")+
+   labs(title = "",
+       x = "",
+       y = "") +
+  scale_fill_manual(values = c("Feminino" = "#FF9933", "Masculino" = "#138808")) +
+  theme_minimal()
+Barra4_
+```
+<br>
+<div style="text-align: justify;"> A tendência do interesse por política mantem-se quando os indianos e indianas são perguntados com que frequência debatem política, sendo a percentagem feminina superior em *Nunca*, já os homens em todas as outras categorias, sendo a diferença de 7% em *As vezes*. A média percentual é de 13%. </div> 
+<br>
+<center>
+
+center>
+<h4>**CONCLUSÃO **</h4>
+<center>
+
+<br>
+<div style="text-align: justify;"> A Índia possui inúmeras desigualdades, dentre elas a de género, um dos meios de se ter mais igualdade de género é incentivando a participação poítica das mulheres. A discussão de separar 33% dos cargos eletivos para as mulheres já circula a algum tempo no Parlamento mas ainda não tornou-se pauta de votação. Algumas regiões já possuem uma cota feminina nas sua assembleias mas ainda existe um longo caminho para a igualdade de género dentro da política. 
+
+Para conseguir a igualdade e participação feminina na política, é necessário incentivar o interesse por política e discutir política deve torna-se um hábito para envolver mais os indianos. Pois os cidadãos se tornam cada vez mais ativos politicamente se tiverem interessados no assunto e isso gera mais discussão. </div> 
+<br>
+<center>
+
+#Referências
+
+[Mulheres indianas e o árduo caminho para a igualdade](https://thetricontinental.org/pt-pt/dossie-45-movimento-mulheres-india/)
+
+
+<br>
+<h4>****</h4>
+
+<br>
+<br>
+<br>
+<div style="text-align: justify;">**Autora:**</div> 
+<div style="text-align: justify;">Júlia Porphirio Orioli nº 160.</div>
+
+<br>
+<div style="text-align: justify;">**Turma:**</div> 
+<div style="text-align: justify;">UpSkill- DataWarehouse</div>
+<br>
+<br>
+<br>
+
+
+```
